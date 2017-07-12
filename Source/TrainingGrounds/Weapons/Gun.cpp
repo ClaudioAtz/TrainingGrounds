@@ -59,6 +59,10 @@ void AGun::OnFire()
 			World->SpawnActor<ABallProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 		}
 	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NO PROJECTILE CLASS"));
+	}
 
 	// try and play the sound if specified
 	if (FireSound != NULL)

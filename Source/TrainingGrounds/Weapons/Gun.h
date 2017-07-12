@@ -20,6 +20,7 @@ public:
 	// Sets default values for this actor's properties
 	AGun();
 
+	UFUNCTION(BlueprintCallable)
 	virtual void OnFire();
 
 
