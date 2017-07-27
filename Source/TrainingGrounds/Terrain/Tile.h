@@ -5,6 +5,18 @@
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
+USTRUCT()
+struct FSpawnPosition
+{
+	GENERATED_USTRUCT_BODY()
+
+	FVector Location;
+	float Rotation;
+	float Scale;
+};
+
+class UActorPool;
+
 UCLASS()
 class TRAININGGROUNDS_API ATile : public AActor
 {
@@ -14,21 +26,42 @@ public:
 	// Sets default values for this actor's properties
 	ATile();
 
-	UFUNCTION(BlueprintCallable, Category = "Setup")
-	void PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawn = 1, int MaxSpawn = 1, float Radius = 500.f, float MinScale = 1, float MaxScale = 1);
-
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Pool")
+	void SetPool(UActorPool* InPool);
+
+	UFUNCTION(BlueprintCallable, Category = "Spawning")
+	void PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawn = 1, int MaxSpawn = 1, float Radius = 500.f, float MinScale = 1, float MaxScale = 1);
+
+	UFUNCTION(BlueprintCallable, Category = "Spawning")
+	void PlaceAiPawns(TSubclassOf<APawn> ToSpawn, int MinSpawn = 1, int MaxSpawn = 1, float Radius = 50.f);
+
+protected:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+	FVector NavigationBoundsOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+	FVector MinSpawningExtent;
+	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
+	FVector MaxSpawningExtent;
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+
 private:
+
+	UActorPool* Pool = nullptr;
+	AActor* NavMeshBoundsVolume = nullptr;
 
 	bool CastSphere(FVector Location, float Radius);
 	bool FindEmptyLocation(FVector& OutEmptySpace, float Radius);
-	void PlaceActor(TSubclassOf<AActor> ToSpawn, FVector Location, float Rotation = 0, float Scale = 1.f);
+	void PlaceActor(TSubclassOf<AActor> ToSpawn, const FSpawnPosition& SpawnPosition);
+	void PositionNavMeshBoundsVolume();
 	
 };
