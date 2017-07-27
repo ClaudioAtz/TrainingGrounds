@@ -31,3 +31,14 @@ void AInfiniteTerrainGameMode::AddToPool(ANavMeshBoundsVolume* VolumeToAdd)
 		NavMeshBoundsVolumePool->Add(VolumeToAdd);
 	}
 }
+
+void AInfiniteTerrainGameMode::TileConquered()
+{
+	Score++;
+	UE_LOG(LogTemp, Warning, TEXT("Tile conquered. Number of conquered tiles : %i"), Score);
+}
+
+int AInfiniteTerrainGameMode::GetNumberOfConqueredTiles()
+{
+	return Score;
+}

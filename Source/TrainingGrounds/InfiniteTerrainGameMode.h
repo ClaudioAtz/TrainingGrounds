@@ -22,11 +22,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Pool")
 	void PopulateBoundsVolumePool();
 
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	void TileConquered();
+
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	int GetNumberOfConqueredTiles();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pool")
 	UActorPool* NavMeshBoundsVolumePool = nullptr;
 
 private:
 	void AddToPool(ANavMeshBoundsVolume* VolumeToAdd);
-	
+
+	// Number of "rooms" you've been through
+	int Score = 0;
 };

@@ -38,6 +38,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Spawning")
 	void PlaceAiPawns(TSubclassOf<APawn> ToSpawn, int MinSpawn = 1, int MaxSpawn = 1, float Radius = 50.f);
 
+	UFUNCTION(BlueprintCallable, Category = "Conquest")
+	void SetConqueredTile();
+
+	UFUNCTION(BlueprintCallable, Category = "Conquest")
+	bool IsTileConquered();
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
@@ -58,6 +64,8 @@ private:
 
 	UActorPool* Pool = nullptr;
 	AActor* NavMeshBoundsVolume = nullptr;
+
+	bool bConquered = false;
 
 	bool CastSphere(FVector Location, float Radius);
 	bool FindEmptyLocation(FVector& OutEmptySpace, float Radius);

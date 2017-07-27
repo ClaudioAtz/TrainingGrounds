@@ -169,3 +169,13 @@ void ATile::PositionNavMeshBoundsVolume()
 		UE_LOG(LogTemp, Error, TEXT("Failed to checkout NavMesh from NavMeshPool"));
 	}
 }
+
+void ATile::SetConqueredTile()
+{
+	bConquered = true;
+}
+
+bool ATile::IsTileConquered()
+{
+	return bConquered;
+}
