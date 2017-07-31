@@ -19,12 +19,15 @@ public:
 
 	virtual void UnPossessed() override;
 
+	virtual void PossessedBy(AController* NewController) override;
+
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void Fire();
 
-
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	TSubclassOf<class AGun> GunBlueprint;
+
+	void EquipWeapon(TSubclassOf<class AGun> Weapon);
 
 protected:
 	// Called when the game starts or when spawned
@@ -40,5 +43,6 @@ private:
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FirstPersonCameraComponent;
-	
+
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 };

@@ -2,7 +2,9 @@
 
 #include "TrainingGrounds.h"
 #include "Mannequin.h"
+#include "Components/ArrowComponent.h"
 #include "Weapons/Gun.h"
+#include "Props/ItemAltar.h"
 
 // Sets default values
 AMannequin::AMannequin()
@@ -24,6 +26,7 @@ AMannequin::AMannequin()
 	Mesh1P->CastShadow = false;
 	Mesh1P->RelativeRotation = FRotator(1.9f, -19.19f, 5.2f);
 	Mesh1P->RelativeLocation = FVector(-0.5f, -4.4f, -155.7f);
+
 }
 
 // Called when the game starts or when spawned
@@ -31,26 +34,8 @@ void AMannequin::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GunBlueprint == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No GunBP present"));
-		return;
-	}
-
-	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-	Gun = GetWorld()->SpawnActor<AGun>(GunBlueprint);
-
-	if (IsPlayerControlled())
-	{
-		Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-	} 
-	else
-	{
-		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-	}
-
-	Gun->AnimInstance1P = Mesh1P->GetAnimInstance();
-	Gun->AnimInstance3P = GetMesh()->GetAnimInstance();
+	// Equip default weapon
+	EquipWeapon(GunBlueprint);
 
 	if (InputComponent != nullptr)
 	{
@@ -74,6 +59,24 @@ void AMannequin::UnPossessed()
 	}
 }
 
+void AMannequin::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (IsPlayerControlled())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Setting View target"));
+		auto PlayerController = Cast < APlayerController > (NewController);
+
+		if (PlayerController != nullptr)
+		{
+			PlayerController->bAutoManageActiveCameraTarget = false;
+			PlayerController->SetViewTargetWithBlend(this);
+		}
+
+	}
+}
+
 void AMannequin::Fire()
 {
 	if (Gun != nullptr)
@@ -82,3 +85,53 @@ void AMannequin::Fire()
 	}
 }
 
+void AMannequin::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	if (OtherActor != nullptr)
+	{
+		if(OtherActor->ActorHasTag(FName("Item")))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("######## TOUCHING ITEM #####"));
+			auto ItemAltar = Cast<AItemAltar>(OtherActor);
+
+			if (ItemAltar != nullptr)
+			{
+				auto Item = ItemAltar->GetItem();
+				if (Item != nullptr)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Picked up item %s"), *Item->GetName());
+					EquipWeapon(Item);
+				}
+			}
+		}
+	}
+}
+
+void AMannequin::EquipWeapon(TSubclassOf<class AGun> Weapon)
+{
+	if (Weapon == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No GunBP present"));
+		return;
+	}
+
+	if (Gun != nullptr)
+	{
+		Gun->Destroy();
+	}
+
+	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
+	Gun = GetWorld()->SpawnActor<AGun>(Weapon);
+
+	if (IsPlayerControlled())
+	{
+		Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	}
+	else
+	{
+		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+	}
+
+	Gun->AnimInstance1P = Mesh1P->GetAnimInstance();
+	Gun->AnimInstance3P = GetMesh()->GetAnimInstance();
+}

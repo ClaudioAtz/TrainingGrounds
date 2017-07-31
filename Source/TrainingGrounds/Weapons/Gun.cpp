@@ -30,6 +30,8 @@ void AGun::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// So we can shoot straight away.
+	LastFireTime = -ReloadTimeInSeconds;
 }
 
 // Called every frame
@@ -42,7 +44,7 @@ void AGun::Tick(float DeltaTime)
 void AGun::OnFire()
 {
 	// try and fire a projectile
-	if (ProjectileClass != NULL)
+	if (ProjectileClass != NULL && !IsReloading())
 	{
 		UWorld* const World = GetWorld();
 		if (World != NULL)
@@ -57,26 +59,33 @@ void AGun::OnFire()
 
 			// spawn the projectile at the muzzle
 			World->SpawnActor<ABallProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
+			LastFireTime = GetWorld()->GetTimeSeconds();
+
+			// try and play the sound if specified
+			if (FireSound != nullptr)
+			{
+				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+			}
+
+			// try and play a firing animation if specified
+			if (AnimInstance1P != nullptr && FireAnimation1P != nullptr)
+			{
+				AnimInstance1P->Montage_Play(FireAnimation1P, 1.f);
+			}
+			else if (AnimInstance3P != nullptr && FireAnimation3P != nullptr)
+			{
+				AnimInstance3P->Montage_Play(FireAnimation3P, 1.f);
+			}
 		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("NO PROJECTILE CLASS"));
 	}
+}
 
-	// try and play the sound if specified
-	if (FireSound != nullptr)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-	}
-
-	// try and play a firing animation if specified
-	if (AnimInstance1P != nullptr && FireAnimation1P != nullptr)
-	{
-		AnimInstance1P->Montage_Play(FireAnimation1P, 1.f);
-	}
-	else if (AnimInstance3P != nullptr && FireAnimation3P != nullptr)
-	{
-		AnimInstance3P->Montage_Play(FireAnimation3P, 1.f);
-	}
+bool AGun::IsReloading() const
+{
+	return (GetWorld()->GetTimeSeconds() - LastFireTime) < ReloadTimeInSeconds;
 }
