@@ -9,7 +9,7 @@
 ATile::ATile()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	MinSpawningExtent = FVector(0, -2000, 0);
 	MaxSpawningExtent = FVector(4000, 2000, 0);
@@ -25,17 +25,8 @@ void ATile::BeginPlay()
 
 void ATile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (NavMeshBoundsVolume != nullptr && Pool != nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Returned actor %s"), *NavMeshBoundsVolume->GetName());
-		Pool->Return(NavMeshBoundsVolume);
-	}
-}
-
-// Called every frame
-void ATile::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	Super::EndPlay(EndPlayReason);
+	ReleaseNavMesh();
 }
 
 void ATile::PlaceAiPawns(TSubclassOf<APawn> ToSpawn, int MinSpawn, int MaxSpawn, float Radius)
@@ -57,9 +48,14 @@ void ATile::PlaceAiPawns(TSubclassOf<APawn> ToSpawn, int MinSpawn, int MaxSpawn,
 		{
 			FRotator Rotation(0, SpawnPosition.Rotation, 0);
 			APawn* Spawned = GetWorld()->SpawnActor<APawn>(ToSpawn, SpawnPosition.Location, Rotation);
-			Spawned->SpawnDefaultController();
-			Spawned->Tags.Add(FName("Enemy"));
-			Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+
+			if (Spawned)
+			{
+				Spawned->SpawnDefaultController();
+				Spawned->Tags.Add(FName("Enemy"));
+				Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+			}
+
 		}
 	}
 }
@@ -70,6 +66,7 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawn, int MaxSpawn,
 	if (ToSpawn == nullptr)
 	{
 		return;
+		UE_LOG(LogTemp, Error, TEXT("PlaceActors called with no actor."));
 	}
 
 	int NumberToSpawn = FMath::RandRange(MinSpawn, MaxSpawn);
@@ -117,9 +114,14 @@ bool ATile::CastSphere(FVector Location, float Radius)
 		FCollisionShape::MakeSphere(Radius)
 	);
 
-	FColor SphereColour = (bResult) ? FColor::Red : FColor::Green;
+	if (bResult)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Colliding with %s"), *HitResult.Actor->GetName());
+	}
 
-	/*DrawDebugSphere(
+	/*FColor SphereColour = (bResult) ? FColor::Red : FColor::Green;
+
+	DrawDebugSphere(
 		GetWorld(),
 		GlobalLocation,
 		Radius,
@@ -135,7 +137,10 @@ bool ATile::FindEmptyLocation(FVector& OutEmptySpace, float Radius)
 {
 	FBox Bounds(MinSpawningExtent, MaxSpawningExtent);
 
-	for (int i = 0; i < 100; i++)
+
+	UE_LOG(LogTemp, Warning, TEXT("RADIUS INSIDE FIND EMPTY IS %f"), Radius);
+
+	for (int i = 0; i < 5; i++)
 	{
 		FVector LocationResult = FMath::RandPointInBox(Bounds);
 		if (!CastSphere(LocationResult, Radius))
@@ -183,4 +188,16 @@ void ATile::SetConqueredTile()
 bool ATile::IsTileConquered()
 {
 	return bConquered;
+}
+
+void ATile::ReleaseNavMesh()
+{
+	if (NavMeshBoundsVolume != nullptr && Pool != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Returned actor %s"), *NavMeshBoundsVolume->GetName());
+		Pool->Return(NavMeshBoundsVolume);
+
+		//NavMeshBoundsVolume = nullptr;
+		//Pool = nullptr;
+	}
 }

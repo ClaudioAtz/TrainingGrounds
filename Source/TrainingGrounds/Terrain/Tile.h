@@ -26,9 +26,6 @@ public:
 	// Sets default values for this actor's properties
 	ATile();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	UFUNCTION(BlueprintCallable, Category = "Pool")
 	void SetPool(UActorPool* InPool);
 
@@ -71,5 +68,7 @@ private:
 	bool FindEmptyLocation(FVector& OutEmptySpace, float Radius);
 	void PlaceActor(TSubclassOf<AActor> ToSpawn, const FSpawnPosition& SpawnPosition);
 	void PositionNavMeshBoundsVolume();
+
+	void ReleaseNavMesh();
 	
 };
