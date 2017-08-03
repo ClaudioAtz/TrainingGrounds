@@ -26,6 +26,7 @@ void ATile::BeginPlay()
 void ATile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+	ReleaseActors();
 	ReleaseNavMesh();
 }
 
@@ -54,6 +55,7 @@ void ATile::PlaceAiPawns(TSubclassOf<APawn> ToSpawn, int MinSpawn, int MaxSpawn,
 				Spawned->SpawnDefaultController();
 				Spawned->Tags.Add(FName("Enemy"));
 				Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+				SpawnedActors.Push(Spawned);
 			}
 
 		}
@@ -96,6 +98,8 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, const FSpawnPosition& SpawnP
 	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn, SpawnPosition.Location, Rotation);
 	Spawned->SetActorScale3D(FVector(SpawnPosition.Scale));
 	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
+
+	SpawnedActors.Push(Spawned);
 }
 
 bool ATile::CastSphere(FVector Location, float Radius)
@@ -200,4 +204,25 @@ void ATile::ReleaseNavMesh()
 		//NavMeshBoundsVolume = nullptr;
 		//Pool = nullptr;
 	}
+}
+
+void ATile::ReleaseActors()
+{
+	for (AActor* Actor : SpawnedActors)
+	{
+		if(Actor != nullptr)
+		{
+			Actor->Destroy();
+		}
+	}
+}
+
+void ATile::SetConquerCondition(EConquerCondition Condition)
+{
+	ConquerCondition = Condition;
+}
+
+EConquerCondition ATile::GetConquerCondition()
+{
+	return ConquerCondition;
 }

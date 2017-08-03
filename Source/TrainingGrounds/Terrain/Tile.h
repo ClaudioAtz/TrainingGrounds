@@ -5,6 +5,10 @@
 #include "GameFramework/Actor.h"
 #include "Tile.generated.h"
 
+// Enum for aiming states
+UENUM()
+enum class EConquerCondition : uint8 { Stealth, Assassination, Rescue };
+
 USTRUCT()
 struct FSpawnPosition
 {
@@ -41,6 +45,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Conquest")
 	bool IsTileConquered();
 
+	UFUNCTION(BlueprintCallable, Category = "Conquest")
+	void SetConquerCondition(EConquerCondition Condition);
+
+	UFUNCTION(BlueprintCallable, Category = "Conquest")
+	EConquerCondition GetConquerCondition();
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
@@ -62,6 +72,10 @@ private:
 	UActorPool* Pool = nullptr;
 	AActor* NavMeshBoundsVolume = nullptr;
 
+	TArray < AActor* > SpawnedActors;
+
+	EConquerCondition ConquerCondition;
+
 	bool bConquered = false;
 
 	bool CastSphere(FVector Location, float Radius);
@@ -70,5 +84,6 @@ private:
 	void PositionNavMeshBoundsVolume();
 
 	void ReleaseNavMesh();
+	void ReleaseActors();
 	
 };

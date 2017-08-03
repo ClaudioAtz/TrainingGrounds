@@ -39,8 +39,15 @@ void AMannequin::BeginPlay()
 
 	if (InputComponent != nullptr)
 	{
-		InputComponent->BindAction("Fire", IE_Pressed, this, &AMannequin::Fire);
+		InputComponent->BindAxis("Fire", this, &AMannequin::Fire);
 	}
+}
+
+void AMannequin::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	
+	CleanUp();
 }
 
 // Called to bind functionality to input
@@ -77,11 +84,15 @@ void AMannequin::PossessedBy(AController* NewController)
 	}
 }
 
-void AMannequin::Fire()
+void AMannequin::Fire(float Value)
 {
 	if (Gun != nullptr)
 	{
-		Gun->OnFire();
+		if (Value != 0.f)
+		{
+			Gun->OnFire();
+		}
+		
 	}
 }
 
@@ -134,4 +145,12 @@ void AMannequin::EquipWeapon(TSubclassOf<class AGun> Weapon)
 
 	Gun->AnimInstance1P = Mesh1P->GetAnimInstance();
 	Gun->AnimInstance3P = GetMesh()->GetAnimInstance();
+}
+
+void AMannequin::CleanUp()
+{
+	if (Gun != nullptr)
+	{
+		Gun->Destroy();
+	}
 }
