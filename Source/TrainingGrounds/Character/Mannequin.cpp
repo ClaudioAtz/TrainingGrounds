@@ -88,7 +88,7 @@ void AMannequin::Fire(float Value)
 {
 	if (Gun != nullptr)
 	{
-		if (Value != 0.f)
+		if (Value != 0.f || !IsPlayerControlled())
 		{
 			Gun->OnFire();
 		}
