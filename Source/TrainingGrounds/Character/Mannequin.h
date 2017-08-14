@@ -36,6 +36,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
+
 	UPROPERTY(VisibleDefaultsOnly, Category = "Weapon")
 	AGun* Gun = nullptr;
 
