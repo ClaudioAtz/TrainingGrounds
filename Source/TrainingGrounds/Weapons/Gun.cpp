@@ -58,7 +58,14 @@ void AGun::OnFire()
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
 			// spawn the projectile at the muzzle
-			World->SpawnActor<ABallProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			auto Projectile = World->SpawnActor<ABallProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
+			if (Projectile != nullptr && Tags.Num() > 0)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("tag is %s"), *Tags[0].ToString());
+				Projectile->SetTeamTag(Tags[0]);
+			}
+
 
 			LastFireTime = GetWorld()->GetTimeSeconds();
 
@@ -81,7 +88,7 @@ void AGun::OnFire()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NO PROJECTILE CLASS"));
+		//UE_LOG(LogTemp, Warning, TEXT("NO PROJECTILE CLASS"));
 	}
 }
 

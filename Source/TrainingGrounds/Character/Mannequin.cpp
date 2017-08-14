@@ -133,6 +133,8 @@ void AMannequin::EquipWeapon(TSubclassOf<class AGun> Weapon)
 
 	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
 	Gun = GetWorld()->SpawnActor<AGun>(Weapon);
+	// Tag the gun with the right "team"
+	Gun->Tags.Push(Tags[0]);
 
 	if (IsPlayerControlled())
 	{

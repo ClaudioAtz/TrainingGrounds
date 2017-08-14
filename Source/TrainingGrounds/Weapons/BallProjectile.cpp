@@ -41,3 +41,25 @@ void ABallProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UP
 		Destroy();
 	}
 }
+
+bool ABallProjectile::IsFriendlyFire() const
+{
+	return bFriendlyFire;
+}
+
+bool ABallProjectile::ShouldApplyDamage(AActor* OtherActor) const
+{
+	// Always suggest to apply damage if FF flag is active.
+	if (IsFriendlyFire())
+	{
+		return true;
+	}
+
+	// Only apply damage to other teams if FF is  not active.
+	if (OtherActor != nullptr && !OtherActor->ActorHasTag(TeamTag))
+	{
+		return true;
+	}
+
+	return false;
+}
