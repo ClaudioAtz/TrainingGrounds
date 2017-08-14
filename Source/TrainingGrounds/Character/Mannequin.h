@@ -5,6 +5,8 @@
 #include "GameFramework/Character.h"
 #include "Mannequin.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMannequinDelegate);
+
 UCLASS()
 class TRAININGGROUNDS_API AMannequin : public ACharacter
 {
@@ -28,6 +30,8 @@ public:
 	TSubclassOf<class AGun> GunBlueprint;
 
 	void EquipWeapon(TSubclassOf<class AGun> Weapon);
+
+	FMannequinDelegate OnMannequinDeath;
 
 protected:
 	// Called when the game starts or when spawned

@@ -60,6 +60,8 @@ void AMannequin::UnPossessed()
 {
 	Super::UnPossessed();
 
+	OnMannequinDeath.Broadcast();
+
 	if (Gun != nullptr) 
 	{
 		Gun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));

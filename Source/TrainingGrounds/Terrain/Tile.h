@@ -6,6 +6,11 @@
 #include "InfiniteTerrainGameMode.h"
 #include "Tile.generated.h"
 
+
+// Enum for mission types
+UENUM()
+enum class EConquerCondition : uint8 { Stealth, Assassination, Rescue, None };
+
 USTRUCT()
 struct FSpawnPosition
 {
@@ -48,6 +53,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Conquest")
 	EConquerCondition GetConquerCondition();
 
+	UFUNCTION()
+	void OnPossessedEnemyDeath();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Conquest")
+	void OnTileConquered();
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawning")
@@ -75,8 +86,11 @@ private:
 	// Number of enemies spawned
 	int SpawnedEnemies = 0;
 
+	int KilledEnemies = 0;
+
 	// Tile Conquer Condition
-	EConquerCondition ConquerCondition = EConquerCondition::None;
+	UPROPERTY(EditAnywhere, Category = "Conquest")
+	EConquerCondition ConquerCondition = EConquerCondition::Assassination;
 
 	bool bConquered = false;
 

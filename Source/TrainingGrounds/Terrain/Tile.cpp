@@ -4,6 +4,7 @@
 #include "Tile.h"
 #include "DrawDebugHelpers.h"
 #include "ActorPool.h"
+#include "Character/Mannequin.h"
 
 // Sets default values
 ATile::ATile()
@@ -58,6 +59,11 @@ void ATile::PlaceAiPawns(TSubclassOf<APawn> ToSpawn, int MinSpawn, int MaxSpawn,
 				SpawnedActors.Push(Spawned);
 			}
 
+			auto Mannequin = Cast<AMannequin>(Spawned);
+			if (Mannequin != nullptr)
+			{
+				Mannequin->OnMannequinDeath.AddUniqueDynamic(this, &ATile::OnPossessedEnemyDeath);
+			}
 		}
 	}
 }
@@ -225,4 +231,15 @@ void ATile::SetConquerCondition(EConquerCondition Condition)
 EConquerCondition ATile::GetConquerCondition()
 {
 	return ConquerCondition;
+}
+
+void ATile::OnPossessedEnemyDeath()
+{
+	KilledEnemies++;
+
+	if (KilledEnemies >= SpawnedEnemies)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ROom completed!"));
+		OnTileConquered();
+	}
 }

@@ -42,28 +42,3 @@ int AInfiniteTerrainGameMode::GetNumberOfConqueredTiles() const
 {
 	return Score;
 }
-
-EConquerCondition AInfiniteTerrainGameMode::GetCurrentConquerCondition() const
-{
-	return CurrentConquerCondition;
-}
-
-void AInfiniteTerrainGameMode::SetCurrentConquerCondition(EConquerCondition Condition)
-{
-	CurrentConquerCondition = Condition;
-
-	switch (Condition)
-	{
-	case EConquerCondition::Assassination:
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Current conquer condition is assassination"));
-		}
-		break;
-	default:
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Current conquer condition is default"));
-	}
-	break;
-	}
-
-}
