@@ -3,11 +3,8 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "InfiniteTerrainGameMode.h"
 #include "Tile.generated.h"
-
-// Enum for aiming states
-UENUM()
-enum class EConquerCondition : uint8 { Stealth, Assassination, Rescue };
 
 USTRUCT()
 struct FSpawnPosition
@@ -72,9 +69,14 @@ private:
 	UActorPool* Pool = nullptr;
 	AActor* NavMeshBoundsVolume = nullptr;
 
+	// Array of references to all spawned actors in the tile, kept for cleaning up duties
 	TArray < AActor* > SpawnedActors;
 
-	EConquerCondition ConquerCondition;
+	// Number of enemies spawned
+	int SpawnedEnemies = 0;
+
+	// Tile Conquer Condition
+	EConquerCondition ConquerCondition = EConquerCondition::None;
 
 	bool bConquered = false;
 

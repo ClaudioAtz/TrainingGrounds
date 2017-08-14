@@ -5,6 +5,11 @@
 #include "TrainingGroundsGameMode.h"
 #include "InfiniteTerrainGameMode.generated.h"
 
+
+// Enum for mission types
+UENUM()
+enum class EConquerCondition : uint8 { Stealth, Assassination, Rescue, None };
+
 class ANavMeshBoundsVolume;
 class UActorPool;
 
@@ -26,7 +31,13 @@ public:
 	void TileConquered();
 
 	UFUNCTION(BlueprintCallable, Category = "Score")
-	int GetNumberOfConqueredTiles();
+	int GetNumberOfConqueredTiles() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	EConquerCondition GetCurrentConquerCondition() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Score")
+	void SetCurrentConquerCondition(EConquerCondition Condition);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pool")
@@ -34,6 +45,9 @@ protected:
 
 private:
 	void AddToPool(ANavMeshBoundsVolume* VolumeToAdd);
+
+	// Current tile active conquer condition
+	EConquerCondition CurrentConquerCondition = EConquerCondition::None;
 
 	// Number of "rooms" you've been through
 	int Score = 0;

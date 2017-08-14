@@ -38,9 +38,9 @@ void ATile::PlaceAiPawns(TSubclassOf<APawn> ToSpawn, int MinSpawn, int MaxSpawn,
 		return;
 	}
 
-	int NumberToSpawn = FMath::RandRange(MinSpawn, MaxSpawn);
+	SpawnedEnemies = FMath::RandRange(MinSpawn, MaxSpawn);
 
-	for (size_t i = 0; i < NumberToSpawn; i++)
+	for (size_t i = 0; i < SpawnedEnemies; i++)
 	{
 		FSpawnPosition SpawnPosition;
 		SpawnPosition.Scale = 1;
