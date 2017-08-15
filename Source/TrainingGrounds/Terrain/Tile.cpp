@@ -39,9 +39,11 @@ void ATile::PlaceAiPawns(TSubclassOf<APawn> ToSpawn, int MinSpawn, int MaxSpawn,
 		return;
 	}
 
-	SpawnedEnemies = FMath::RandRange(MinSpawn, MaxSpawn);
+	SpawnedEnemies = 0;
 
-	for (size_t i = 0; i < SpawnedEnemies; i++)
+	int RandomEnemies = FMath::RandRange(MinSpawn, MaxSpawn);
+
+	for (size_t i = 0; i < RandomEnemies; i++)
 	{
 		FSpawnPosition SpawnPosition;
 		SpawnPosition.Scale = 1;
@@ -62,6 +64,7 @@ void ATile::PlaceAiPawns(TSubclassOf<APawn> ToSpawn, int MinSpawn, int MaxSpawn,
 			auto Mannequin = Cast<AMannequin>(Spawned);
 			if (Mannequin != nullptr)
 			{
+				SpawnedEnemies++;
 				Mannequin->OnMannequinDeath.AddUniqueDynamic(this, &ATile::OnPossessedEnemyDeath);
 			}
 		}
@@ -123,13 +126,8 @@ bool ATile::CastSphere(FVector Location, float Radius)
 		ECollisionChannel::ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(Radius)
 	);
-
-	if (bResult)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Colliding with %s"), *HitResult.Actor->GetName());
-	}
-
-	/*FColor SphereColour = (bResult) ? FColor::Red : FColor::Green;
+/*
+	FColor SphereColour = (bResult) ? FColor::Red : FColor::Green;
 
 	DrawDebugSphere(
 		GetWorld(),
@@ -146,9 +144,6 @@ bool ATile::CastSphere(FVector Location, float Radius)
 bool ATile::FindEmptyLocation(FVector& OutEmptySpace, float Radius)
 {
 	FBox Bounds(MinSpawningExtent, MaxSpawningExtent);
-
-
-	UE_LOG(LogTemp, Warning, TEXT("RADIUS INSIDE FIND EMPTY IS %f"), Radius);
 
 	for (int i = 0; i < 5; i++)
 	{
