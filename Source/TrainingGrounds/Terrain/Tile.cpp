@@ -175,7 +175,6 @@ void ATile::PositionNavMeshBoundsVolume()
 	NavMeshBoundsVolume = Pool->Checkout();
 	if (NavMeshBoundsVolume != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Checked out actor %s"), *NavMeshBoundsVolume->GetName());
 		NavMeshBoundsVolume->SetActorLocation(GetActorLocation() + NavigationBoundsOffset);
 		GetWorld()->GetNavigationSystem()->Build();	
 	}
@@ -199,7 +198,6 @@ void ATile::ReleaseNavMesh()
 {
 	if (NavMeshBoundsVolume != nullptr && Pool != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Returned actor %s"), *NavMeshBoundsVolume->GetName());
 		Pool->Return(NavMeshBoundsVolume);
 
 		//NavMeshBoundsVolume = nullptr;
@@ -234,7 +232,6 @@ void ATile::OnPossessedEnemyDeath()
 
 	if (KilledEnemies >= SpawnedEnemies)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ROom completed!"));
 		OnTileConquered();
 	}
 }

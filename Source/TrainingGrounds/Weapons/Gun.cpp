@@ -55,14 +55,13 @@ void AGun::OnFire()
 
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
-			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 			// spawn the projectile at the muzzle
 			auto Projectile = World->SpawnActor<ABallProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 
 			if (Projectile != nullptr && Tags.Num() > 0)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("tag is %s"), *Tags[0].ToString());
 				Projectile->SetTeamTag(Tags[0]);
 			}
 
