@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "ItemAltar.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FItemDelegate);
 
 // Enum for altar type
 UENUM(BlueprintType)
@@ -51,6 +52,13 @@ public:
 	UFUNCTION()
 	TSubclassOf<AItem> GetItem() const;
 
+	// Delegate to notify if an item has been collected
+	FItemDelegate OnItemCollected;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Setup")
+	AItem* SpawnedItem = nullptr;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -61,6 +69,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	AItem* ItemMesh = nullptr;
+
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+
+	bool bConsumed = false;
 
 };

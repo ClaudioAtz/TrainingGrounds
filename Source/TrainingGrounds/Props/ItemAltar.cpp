@@ -18,6 +18,7 @@ AItemAltar::AItemAltar()
 	Altar->CastShadow = true;
 
 	ItemArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("FloatingItemArrow"));
+	ItemArrow->SetupAttachment(Altar);
 }
 
 // Called when the game starts or when spawned
@@ -28,11 +29,9 @@ void AItemAltar::BeginPlay()
 	FActorSpawnParameters ActorSpawnParams;
 	ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	UE_LOG(LogTemp, Warning, TEXT("Arrow location at begin play is %s"), *ItemArrow->GetComponentLocation().ToCompactString());
-
 	if (Item != nullptr)
 	{
-		ItemMesh = GetWorld()->SpawnActor<AItem>(
+		SpawnedItem = GetWorld()->SpawnActor<AItem>(
 			Item,
 			ItemArrow->GetComponentLocation(),
 			ItemArrow->GetComponentRotation(),
@@ -41,7 +40,7 @@ void AItemAltar::BeginPlay()
 	}
 	else if (Weapon != nullptr)
 	{
-		ItemMesh = GetWorld()->SpawnActor<AItem>(
+		SpawnedItem = GetWorld()->SpawnActor<AItem>(
 			Weapon,
 			ItemArrow->GetComponentLocation(),
 			ItemArrow->GetComponentRotation(),
@@ -50,8 +49,7 @@ void AItemAltar::BeginPlay()
 	}
 
 	// Make sure that the floating item follows the altar wherever it's spawned.
-	ItemMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
-
+	SpawnedItem->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 }
 
 // Called every frame
@@ -59,9 +57,9 @@ void AItemAltar::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (ItemMesh != nullptr)
+	if (SpawnedItem != nullptr)
 	{
-		ItemMesh->AddActorLocalRotation(FRotator(0.f, ItemRotationSpeed * DeltaTime, 0.f));
+		SpawnedItem->AddActorLocalRotation(FRotator(0.f, ItemRotationSpeed * DeltaTime, 0.f));
 	}
 }
 
@@ -73,5 +71,32 @@ TSubclassOf<AGun> AItemAltar::GetWeapon() const
 TSubclassOf<AItem> AItemAltar::GetItem() const
 {
 	return Item;
+}
+
+void AItemAltar::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	if (OtherActor != nullptr && OtherActor->ActorHasTag(FName("Player")))
+	{
+			switch (ItemType)
+			{
+				case EItemType::Quest :
+				{
+					bConsumed = true;
+					if (SpawnedItem != nullptr)
+					{
+						OnItemCollected.Broadcast();
+						SpawnedItem->Destroy();
+					}
+					Altar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				}
+				break;
+				default:
+				{
+					UE_LOG(LogTemp, Warning, TEXT("COnsuming item"));
+				}
+				break;
+			}
+		
+	}
 }
 

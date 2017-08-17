@@ -74,7 +74,6 @@ void AMannequin::PossessedBy(AController* NewController)
 
 	if (IsPlayerControlled())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Setting View target"));
 		auto PlayerController = Cast < APlayerController > (NewController);
 
 		if (PlayerController != nullptr)
@@ -104,15 +103,13 @@ void AMannequin::NotifyActorBeginOverlap(AActor* OtherActor)
 	{
 		if(OtherActor->ActorHasTag(FName("Item")))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("######## TOUCHING ITEM #####"));
 			auto ItemAltar = Cast<AItemAltar>(OtherActor);
 
-			if (ItemAltar != nullptr)
+			if (ItemAltar != nullptr && ItemAltar->ItemType == EItemType::Weapon)
 			{
 				auto Item = ItemAltar->GetWeapon();
 				if (Item != nullptr)
 				{
-					UE_LOG(LogTemp, Warning, TEXT("Picked up item %s"), *Item->GetName());
 					EquipWeapon(Item);
 				}
 			}

@@ -5,6 +5,7 @@
 #include "DrawDebugHelpers.h"
 #include "ActorPool.h"
 #include "Character/Mannequin.h"
+#include "Props/ItemAltar.h"
 
 // Sets default values
 ATile::ATile()
@@ -71,7 +72,7 @@ void ATile::PlaceAiPawns(TSubclassOf<APawn> ToSpawn, int MinSpawn, int MaxSpawn,
 	}
 }
 
-void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawn, int MaxSpawn, float Radius, float MinScale, float MaxScale)
+void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawn, int MaxSpawn, float Radius, float MinScale, float MaxScale, bool QuestItem)
 {
 	// Immediately return if no class has been passed.
 	if (ToSpawn == nullptr)
@@ -90,16 +91,24 @@ void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, int MinSpawn, int MaxSpawn,
 		if (FindEmptyLocation(SpawnPosition.Location, Radius * SpawnPosition.Scale))
 		{
 			SpawnPosition.Rotation = FMath::RandRange(-180.f, 180.f);
-			PlaceActor(ToSpawn, SpawnPosition);
+			auto Actor = PlaceActor(ToSpawn, SpawnPosition);
+			if (Actor != nullptr && QuestItem == true)
+			{
+				auto Altar = Cast<AItemAltar>(Actor);
+				if (Altar != nullptr)
+				{
+					Altar->OnItemCollected.AddUniqueDynamic(this, &ATile::OnQuestItemCollected);
+				}
+			}
 		}
 	}
 }
 
-void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, const FSpawnPosition& SpawnPosition)
+AActor* ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, const FSpawnPosition& SpawnPosition)
 {
 	if (ToSpawn == nullptr)
 	{
-		return;
+		return nullptr;
 	}
 
 	FRotator Rotation(0, SpawnPosition.Rotation, 0);
@@ -109,6 +118,8 @@ void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, const FSpawnPosition& SpawnP
 	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
 
 	SpawnedActors.Push(Spawned);
+
+	return Spawned;
 }
 
 bool ATile::CastSphere(FVector Location, float Radius)
@@ -240,6 +251,18 @@ void ATile::OnPossessedEnemyDeath()
 	KilledEnemies++;
 
 	if (KilledEnemies >= SpawnedEnemies && ConquerCondition == EConquerCondition::Assassination)
+	{
+		OnTileConquered();
+	}
+}
+
+void ATile::OnQuestItemCollected()
+{
+	QuestItemCollected++;
+
+	UE_LOG(LogTemp, Warning, TEXT("Q Collected : %i"), QuestItemCollected);
+
+	if (QuestItemCollected >= MaxQuestItems && ConquerCondition == EConquerCondition::Rescue)
 	{
 		OnTileConquered();
 	}
