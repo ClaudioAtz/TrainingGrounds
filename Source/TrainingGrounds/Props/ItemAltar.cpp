@@ -16,10 +16,8 @@ AItemAltar::AItemAltar()
 	Altar = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Altar"));
 	Altar->bCastDynamicShadow = false;
 	Altar->CastShadow = true;
-	Altar->RelativeLocation = FVector(0.f, 0.f, 0.f);
 
 	ItemArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("FloatingItemArrow"));
-	ItemArrow->SetupAttachment(Altar);
 }
 
 // Called when the game starts or when spawned
@@ -28,7 +26,9 @@ void AItemAltar::BeginPlay()
 	Super::BeginPlay();
 
 	FActorSpawnParameters ActorSpawnParams;
-	ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+	ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	UE_LOG(LogTemp, Warning, TEXT("Arrow location at begin play is %s"), *ItemArrow->GetComponentLocation().ToCompactString());
 
 	if (Item != nullptr)
 	{
@@ -48,6 +48,9 @@ void AItemAltar::BeginPlay()
 			ActorSpawnParams
 			);
 	}
+
+	// Make sure that the floating item follows the altar wherever it's spawned.
+	ItemMesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
 
 }
 
