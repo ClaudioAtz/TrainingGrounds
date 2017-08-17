@@ -219,6 +219,15 @@ void ATile::ReleaseActors()
 void ATile::SetConquerCondition(EConquerCondition Condition)
 {
 	ConquerCondition = Condition;
+
+	if (ConquerCondition == EConquerCondition::Assassination)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ASSASS COND"));
+	}
+	if (ConquerCondition == EConquerCondition::Rescue)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("RESCUE COND"));
+	}
 }
 
 EConquerCondition ATile::GetConquerCondition()
@@ -230,7 +239,7 @@ void ATile::OnPossessedEnemyDeath()
 {
 	KilledEnemies++;
 
-	if (KilledEnemies >= SpawnedEnemies)
+	if (KilledEnemies >= SpawnedEnemies && ConquerCondition == EConquerCondition::Assassination)
 	{
 		OnTileConquered();
 	}

@@ -109,7 +109,7 @@ void AMannequin::NotifyActorBeginOverlap(AActor* OtherActor)
 
 			if (ItemAltar != nullptr)
 			{
-				auto Item = ItemAltar->GetItem();
+				auto Item = ItemAltar->GetWeapon();
 				if (Item != nullptr)
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Picked up item %s"), *Item->GetName());

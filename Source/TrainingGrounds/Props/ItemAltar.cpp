@@ -2,6 +2,7 @@
 
 #include "TrainingGrounds.h"
 #include "ItemAltar.h"
+#include "Item.h"
 #include "Components/ArrowComponent.h"
 #include "Weapons/Gun.h"
 
@@ -25,25 +26,28 @@ AItemAltar::AItemAltar()
 void AItemAltar::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	if (Item == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No GunBP present"));
-		return;
-	}
 
 	FActorSpawnParameters ActorSpawnParams;
 	ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
-	UE_LOG(LogTemp, Warning, TEXT("SPawning item at %s"), *ItemArrow->GetComponentLocation().ToCompactString());
-
-	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-	ItemMesh = GetWorld()->SpawnActor<AGun>(
-		Item,
-		ItemArrow->GetComponentLocation(),
-		ItemArrow->GetComponentRotation(),
-		ActorSpawnParams
-	);
+	if (Item != nullptr)
+	{
+		ItemMesh = GetWorld()->SpawnActor<AItem>(
+			Item,
+			ItemArrow->GetComponentLocation(),
+			ItemArrow->GetComponentRotation(),
+			ActorSpawnParams
+			);
+	}
+	else if (Weapon != nullptr)
+	{
+		ItemMesh = GetWorld()->SpawnActor<AItem>(
+			Weapon,
+			ItemArrow->GetComponentLocation(),
+			ItemArrow->GetComponentRotation(),
+			ActorSpawnParams
+			);
+	}
 
 }
 
@@ -58,7 +62,12 @@ void AItemAltar::Tick(float DeltaTime)
 	}
 }
 
-TSubclassOf<AGun> AItemAltar::GetItem() const
+TSubclassOf<AGun> AItemAltar::GetWeapon() const
+{
+	return Weapon;
+}
+
+TSubclassOf<AItem> AItemAltar::GetItem() const
 {
 	return Item;
 }

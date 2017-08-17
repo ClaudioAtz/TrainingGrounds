@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "GameFramework/Actor.h"
+#include "Item.h"
 #include "Gun.generated.h"
 
 UCLASS()
-class TRAININGGROUNDS_API AGun : public AActor
+class TRAININGGROUNDS_API AGun : public AItem
 {
 	GENERATED_BODY()
 

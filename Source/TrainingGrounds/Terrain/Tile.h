@@ -8,8 +8,8 @@
 
 
 // Enum for mission types
-UENUM()
-enum class EConquerCondition : uint8 { Stealth, Assassination, Rescue, None };
+UENUM(BlueprintType)
+enum class EConquerCondition : uint8 { Assassination, Rescue, None };
 
 USTRUCT()
 struct FSpawnPosition

@@ -7,9 +7,16 @@
 #include "GameFramework/Actor.h"
 #include "ItemAltar.generated.h"
 
+
+// Enum for altar type
+UENUM(BlueprintType)
+enum class EItemType : uint8 { Weapon, Consumable, Quest };
+
 class UArrowComponent;
 class AGun;
 class UStaticMeshComponent;
+class AItem;
+class USkeletalMeshComponent;
 
 UCLASS()
 class TRAININGGROUNDS_API AItemAltar : public AActor
@@ -21,7 +28,10 @@ public:
 	AItemAltar();
 
 	UPROPERTY(EditAnywhere, Category = "Item")
-	TSubclassOf<AGun> Item;
+	TSubclassOf<AGun> Weapon;
+
+	UPROPERTY(EditAnywhere, Category = "Item")
+	TSubclassOf<AItem> Item;
 
 	UPROPERTY(EditAnywhere, Category = Mesh)
 	UStaticMeshComponent* Altar = nullptr;
@@ -29,11 +39,18 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	UArrowComponent* ItemArrow;
 
-	UPROPERTY(EditAnywhere, Category = "Item")
+	UPROPERTY(EditAnywhere, Category = "Setup")
 	float ItemRotationSpeed = 100.f;
 
+	UPROPERTY(EditAnywhere, Category = "Item")
+	EItemType ItemType;
+
 	UFUNCTION()
-	TSubclassOf<AGun> GetItem() const;
+	TSubclassOf<AGun> GetWeapon() const;
+
+	UFUNCTION()
+	TSubclassOf<AItem> GetItem() const;
+
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,8 +60,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
-
 private:
-	AGun* ItemMesh = nullptr;
+	AItem* ItemMesh = nullptr;
+
 };
