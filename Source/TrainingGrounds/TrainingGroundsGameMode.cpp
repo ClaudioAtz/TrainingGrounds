@@ -8,10 +8,13 @@
 ATrainingGroundsGameMode::ATrainingGroundsGameMode()
 	: Super()
 {
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Dynamic/Character/Behaviour/BP_Character"));
-	DefaultPawnClass = PlayerPawnClassFinder.Class;
+	// This is standard and not needed. Also, made the editor hang on loading because of apparently some kind of known problem.
+	// Commenting it out for now.
 
-	// use our custom HUD class
-	HUDClass = ATrainingGroundsHUD::StaticClass();
+	//// set default pawn class to our Blueprinted character
+	//static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Dynamic/Character/Behaviour/BP_Character"));
+	//DefaultPawnClass = PlayerPawnClassFinder.Class;
+
+	//// use our custom HUD class
+	//HUDClass = ATrainingGroundsHUD::StaticClass();
 }
