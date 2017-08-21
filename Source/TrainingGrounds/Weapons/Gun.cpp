@@ -4,6 +4,7 @@
 #include "Gun.h"
 #include "BallProjectile.h"
 #include "Animation/AnimInstance.h"
+#include "Runtime/AIModule/Classes/Perception/AISense_Hearing.h"
 
 
 // Sets default values
@@ -72,6 +73,7 @@ void AGun::OnFire()
 			if (FireSound != nullptr)
 			{
 				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+				UAISense_Hearing::ReportNoiseEvent(this, GetActorLocation(), 1.0, this, 2000.f, FName("SOUND"));
 			}
 
 			// try and play a firing animation if specified
